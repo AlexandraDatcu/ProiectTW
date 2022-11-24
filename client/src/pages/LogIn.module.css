@@ -1,0 +1,12 @@
+.LogForm{
+    box-shadow: inset 1px 1px 3px #ccc;
+    border-radius: 5px;
+}
+.Log{
+    margin: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
