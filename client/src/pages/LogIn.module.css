@@ -1,12 +1,61 @@
 .LogForm{
     box-shadow: inset 1px 1px 3px #ccc;
     border-radius: 5px;
+    block-size: 30px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+.UserValidation{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.BtnSubmit{
+    align-self: flex-end;
+}
+.UserLogIn{
+    display: flex;
+    gap: 80px;
+    flex-direction: column;
 }
 .Log{
     margin: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 16px;
+    gap: 120px;
+}
+.Account{
+    display: flex;
+    flex-direction: row;
+    gap:10px;
+    align-self: flex-start;
+}
+ 
+.CreateAccount{
+    text-decoration: solid;
+    font-size: large;
+    color: red;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.NoAccount{
+    font-size: large;
+}
+
+.passwordForgot{
+    gap:10px;
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+}
+
+.resetPassword{
+    text-decoration: solid;
+    font-size: medium;
+    color: gray;
+    text-decoration: underline;
 }

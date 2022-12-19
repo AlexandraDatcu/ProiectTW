@@ -1,24 +1,25 @@
 import styles from './MainNavigation.module.css';
 import LogIn from '../pages/LogIn';
+import Reviews from '../pages/Reviews';
 import { useState } from 'react';
 
-function MainNavigation(){
-    const [Islog, setLogIsOpen] = useState(false);
-    const [IsSearch, setSearchOpen] = useState(false);
-    const [IsReview, setReviewOpen] = useState(false);
+export default function MainNavigation(){
+    const [activeIndex, setActiveIndex] = useState(3);  
+    
     return(
         <header>
             <div className={styles.meniu}>
                 <label className={styles.logo}>Transport Reviews</label>
                 <div className={styles.buttonsMeniu}>
-                    <button className={styles.btnNav}>Search</button>
-                    <button className={styles.btnNav} onClick={() => setLogIsOpen(true)}>Reviews</button>
-                    <button className={styles.btnNav} onClick={() => setLogIsOpen(true)}>Log in</button>
+                    <button className={styles.btnNav} onClick={()=>setActiveIndex(1)}>Search</button>
+                    <button className={styles.btnNav} onClick={()=>setActiveIndex(2)}>Reviews</button>
+                    <button className={styles.btnNav} onClick={()=>setActiveIndex(3)}>Log in</button>
                 </div>
             </div>
-            {Islog ? <LogIn/> : null}
+            {activeIndex === 2 && <Reviews/>}
+            {activeIndex === 3 && <LogIn/>}
+            
+            
         </header>
     )
 }
-
-export default MainNavigation;
