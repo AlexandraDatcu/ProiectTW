@@ -75,18 +75,46 @@ app.post('/CreateAccount',async(req, res)=>{
     }
  });
 
-app.post('/share/create-trip', async(req,res) => {
+app.post('/share/trip', async(req,res) => {
     const token = authenticateToken(req);
     if(token)
     {
-        try{  
-            const trip = new Trip(req.body);
-            const userid = await User.findOne({attributes : ['id'], where : {username: req.user.username}});
-            trip.userId = userid.id;
-            await trip.save();
-            res.status(201).json({ message: 'created'});
-        }catch(err){
-            res.status(400).json({message: 'syntax trip error'});
+        const id = req.body.id;
+        if(id)
+        {
+            try{  
+                const trip = await Trip.findByPk(id);
+                if(trip)
+                {
+                    trip.plecareA = req.body.plecareA;
+                    trip.sosireB = req.body.sosireB;
+                    trip.mijlocTransport = req.body.mijlocTransport;
+                    trip.oraPlecare = req.body.oraPlecare;
+                    trip.durataCalatoriei = req.body.durataCalatoriei;
+                    trip.observatii = req.body.observatii;
+                    trip.nivelulSatisfactiei = req.body.nivelulSatisfactiei; 
+                    await trip.save();
+                    res.status(202).json({ message: 'updated'});
+                }
+                else
+                {
+                    res.status(404).json({ message: 'trip not found!'});
+                }
+            }catch(err){
+                res.status(400).json({message: 'syntax trip error'});
+            }
+        }
+        else
+        {
+            try{  
+                const trip = new Trip(req.body);
+                const userid = await User.findOne({attributes : ['id'], where : {username: req.user.username}});
+                trip.userId = userid.id;
+                await trip.save();
+                res.status(201).json({ message: 'created'});
+            }catch(err){
+                res.status(400).json({message: 'syntax trip error'});
+            }
         }
     }
     else
@@ -118,6 +146,34 @@ app.get('/share/trips', async(req,res) =>{
     }
 });
 
+app.delete('/share/delete', async(req,res) => {
+    const token = authenticateToken(req);
+    if(token)
+    {
+        try{
+            const trip = await Trip.findByPk(req.body.id);
+            if(trip)
+            {
+                trip.destroy({
+                    where:{
+                        idTrip : req.body.id
+                    }
+                });
+                res.status(202).json({message :'trip deleted'});
+            }
+            else
+            {
+                res.status(404).json({message :'trip no found'});
+            }
+        }catch(err){
+            res.status(400).json({message: 'syntax trip error'});
+        }
+    }
+    else
+    {    
+        res.sendStatus(401).json({message : 'Unauthorized token'});
+    }
+});
 
 async function main() {
     User.hasMany(Trip);
