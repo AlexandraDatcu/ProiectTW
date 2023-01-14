@@ -1,26 +1,39 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
-const session = require('express-session');
-var cookieparser=require('cookie-parser');
 const bcrypt = require("bcrypt")
 const sequelize = require('./database');
-
-sequelize.sync().then(()=>console.log('db is ready'));
+const jwt = require('jsonwebtoken');
+const token_secret = "93e770be5c3ee06bbb587c272a8b46cee1a0b85adb5872f6cb335a8a6008c8e8a6b67be1e7ca5b6d1febdfbfcd6156380ee9f46cc3a534a0da5a32d81ed37287";// require('crypto').randomBytes(64).toString('hex');
 const User = require('./User');
+const Trip = require('./Trip');
 
-app.use(cookieparser());
-app.use(session({
-    secret:'secretTW',
-    resave:true,
-    saveUninitialized:false,
-    cookie:{
-        secure: false,
-        httpOnly:true,
-        maxAge:1000 * 60 * 60 * 2
+function generateAccessToken(username) {
+    return jwt.sign({username}, token_secret, { expiresIn: '1800s' });
+}
+function authenticateToken(req)
+{
+    const authHeader = req.headers['authorization'];
+    if(authHeader.split(' ')[0] != 'Bearer')
+    {
+        return false;
     }
-}));
+    const token = authHeader && authHeader.split(' ')[1];
+    if(token === null)
+    {
+        return false;
+    }
 
+    try
+    {
+        const decoded = jwt.verify(token,token_secret);
+        req.user = decoded;
+        return true;
+    }
+    catch (err) {
+        return false;
+    }
+}
 app.post('/CreateAccount',async(req, res)=>{
     const username = req.body.username;
     const password= req.body.password;
@@ -33,7 +46,7 @@ app.post('/CreateAccount',async(req, res)=>{
             password: item.hash
         })
         await user.save()
-        res.status(201).json({ message: 'db created'});
+        res.status(201).json({ message: 'created', validAuthorization : generateAccessToken(username)});
     } catch (err) {
         console.warn(err)
     }
@@ -43,32 +56,77 @@ app.post('/CreateAccount',async(req, res)=>{
  app.get('/Login', async(req,res)=>{
     const reqUsername = req.body.username;
     const reqPassword = req.body.password;
-
     const user = await User.findOne({where : {username: reqUsername}});
     if(user === null)
     {
         res.status(401).json({message: 'no user'})
     }
-    else{
-        const resultPassword = await bcrypt.compareSync(reqPassword, user.password);
+    else
+    {
+        const resultPassword = bcrypt.compareSync(reqPassword, user.password);
         if(resultPassword)
         {
-            req.session.save((err)=>
-            {
-                if(err){
-                    res.status(401).json({message: 'Session error'});
-                }
-                res.status(201).json({message: 'log in successfully!'});
-            })
-            req.session.username = user.username;
-            req.session.password = user.password;
+            res.status(201).json({message : 'log in successfully!', validAuthorization : generateAccessToken(reqUsername)});
         }
-        else{
-            res.status(401).json({message: 'Password incorrect'});
+        else
+        {
+            res.status(401).json({message : 'Password incorrect'});
         }
     }
  });
 
-app.listen(4000, ()=>{
-    console.log("Serverul a pornit la portul 4000");
-})
+app.post('/share/create-trip', async(req,res) => {
+    const token = authenticateToken(req);
+    if(token)
+    {
+        try{  
+            const trip = new Trip(req.body);
+            const userid = await User.findOne({attributes : ['id'], where : {username: req.user.username}});
+            trip.userId = userid.id;
+            await trip.save();
+            res.status(201).json({ message: 'created'});
+        }catch(err){
+            res.status(400).json({message: 'syntax trip error'});
+        }
+    }
+    else
+    {    
+        res.sendStatus(401).json({message : 'Unauthorized token'});
+    }
+});
+
+
+app.get('/share/trips', async(req,res) =>{
+    const token = authenticateToken(req);
+    if(token)
+    {
+        const userid = await User.findOne({attributes : ['id'], where : {username: req.user.username}});
+        try{
+            const trips = await Trip.findAll({
+                where : {
+                    userId : userid.id
+                }
+            });
+            res.status(200).json(trips);
+        }catch(err){
+            res.status(404).json('No trips');
+        }
+    }
+    else
+    {    
+        res.sendStatus(401).json({message : 'Unauthorized token'});
+    }
+});
+
+
+async function main() {
+    User.hasMany(Trip);
+    Trip.belongsTo(User);
+    await sequelize.sync();
+    console.log('db is ready');
+    app.listen(4000, ()=>{
+        console.log("Serverul a pornit la portul 4000");
+    });
+}
+
+main();
