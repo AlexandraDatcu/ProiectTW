@@ -7,9 +7,10 @@ const jwt = require('jsonwebtoken');
 const token_secret = "93e770be5c3ee06bbb587c272a8b46cee1a0b85adb5872f6cb335a8a6008c8e8a6b67be1e7ca5b6d1febdfbfcd6156380ee9f46cc3a534a0da5a32d81ed37287";// require('crypto').randomBytes(64).toString('hex');
 const User = require('./User');
 const Trip = require('./Trip');
+const { Op } = require("sequelize");
 
 function generateAccessToken(username) {
-    return jwt.sign({username}, token_secret, { expiresIn: '1800s' });
+    return jwt.sign({username}, token_secret, { expiresIn: '10800s' });
 }
 function authenticateToken(req)
 {
@@ -74,7 +75,41 @@ app.post('/CreateAccount',async(req, res)=>{
         }
     }
  });
-
+ app.delete('/DeleteAccount',async(req, res)=>{
+    const token = authenticateToken(req);
+    if(token)
+    {
+        const userid = await User.findOne({attributes : ['id'], where : {username: req.user.username}});
+        if(userid.id)
+        {
+            await Trip.update({userid : null}, {where:{userId : userid.id}});
+            await User.destroy({where : {id : userid.id}});
+            res.status(202).json({message : 'user deleted'});
+        }
+        else
+        {
+            res.status(404).json({message: 'user not found!'});
+        }
+    }
+    else
+    {    
+        res.status(401).json({message : 'Unauthorized token'});
+    }
+ });
+ app.post('/ResetPassword', async(req,res) => {
+    const token = authenticateToken(req);
+    if(token)
+    {
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(req.body.password, salt);   
+        await User.update({password : hash}, {where : {username: req.user.username}});
+        res.status(202).json({message : 'password updated'});
+    }
+    else
+    {
+        res.status(401).json({message : 'Unauthorized token'});
+    }
+ });
 app.post('/share/trip', async(req,res) => {
     const token = authenticateToken(req);
     if(token)
@@ -119,7 +154,7 @@ app.post('/share/trip', async(req,res) => {
     }
     else
     {    
-        res.sendStatus(401).json({message : 'Unauthorized token'});
+        res.status(401).json({message : 'Unauthorized token'});
     }
 });
 
@@ -142,7 +177,7 @@ app.get('/share/trips', async(req,res) =>{
     }
     else
     {    
-        res.sendStatus(401).json({message : 'Unauthorized token'});
+        res.status(401).json({message : 'Unauthorized token'});
     }
 });
 
@@ -154,7 +189,7 @@ app.delete('/share/delete', async(req,res) => {
             const trip = await Trip.findByPk(req.body.id);
             if(trip)
             {
-                trip.destroy({
+                await trip.destroy({
                     where:{
                         idTrip : req.body.id
                     }
@@ -171,7 +206,44 @@ app.delete('/share/delete', async(req,res) => {
     }
     else
     {    
-        res.sendStatus(401).json({message : 'Unauthorized token'});
+        res.status(401).json({message : 'Unauthorized token'});
+    }
+});
+
+app.get('/trips', async(req,res) =>{
+    try{
+        const trips = await Trip.findAll();
+            res.status(200).json(trips);
+    }catch(err){
+        res.status(404).json('No trips');
+    }
+});
+
+app.get('/search/:value', async(req,res) =>{
+    const value = req.params.value;
+    if(value)
+    {
+        try{
+            const trips = await Trip.findAll({
+                where : {
+                    [Op.or]: [  
+                        {plecareA : value},
+                        {sosireB : value},
+                        {mijlocTransport : value}
+                    ]
+                }
+            });
+            if(trips.length > 0)
+            {
+                res.status(200).json(trips);
+            }
+            else
+            {
+                res.status(404).json('No trips');
+            }
+        }catch(err){
+            res.status(400).json({message: 'syntax error'});
+        }
     }
 });
 
