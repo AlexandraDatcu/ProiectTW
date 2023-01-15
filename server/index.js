@@ -219,28 +219,24 @@ app.get('/trips', async(req,res) =>{
     }
 });
 
-app.get('/search/:value', async(req,res) =>{
-    const value = req.params.value;
-    if(value)
+app.get('/search/?', async(req,res) =>{
+    const plecareA = req.query.plecareA;
+    const plecareB = req.query.sosireB;
+    const mijolocTransport = req.query.mijlocTransport;
+    if(plecareA != null && plecareB != null && mijolocTransport != null)
     {
         try{
             const trips = await Trip.findAll({
                 where : {
-                    [Op.or]: [  
-                        {plecareA : value},
-                        {sosireB : value},
-                        {mijlocTransport : value}
+                    [Op.and]: [  
+                        {plecareA : plecareA},
+                        {sosireB : plecareB},
+                        {mijlocTransport : mijolocTransport}
                     ]
                 }
             });
-            if(trips.length > 0)
-            {
-                res.status(200).json(trips);
-            }
-            else
-            {
-                res.status(404).json('No trips');
-            }
+            res.status(200).json(trips);
+            
         }catch(err){
             res.status(400).json({message: 'syntax error'});
         }
