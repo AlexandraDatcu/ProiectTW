@@ -54,7 +54,7 @@ app.post('/CreateAccount',async(req, res)=>{
     
  });
 
- app.get('/Login', async(req,res)=>{
+ app.post('/Login', async(req,res)=>{
     const reqUsername = req.body.username;
     const reqPassword = req.body.password;
     const user = await User.findOne({where : {username: reqUsername}});
