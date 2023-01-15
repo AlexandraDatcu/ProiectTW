@@ -1,5 +1,5 @@
 export default function Reviews() {
-    return(
+    return (
     <div>Reviews</div>
     );
 }

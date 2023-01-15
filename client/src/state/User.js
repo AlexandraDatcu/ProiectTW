@@ -2,11 +2,10 @@ import { useMemo } from 'react';
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-const tokenKey = "jwt";
 export const useUserStore = create(
   persist(
     (set) => ({
-      jwt: localStorage.getItem(tokenKey),
+      jwt: null,
       setJwt: (newJwt) => set({ jwt: newJwt }),
     }),
     {
