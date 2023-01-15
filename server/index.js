@@ -8,7 +8,6 @@ const token_secret = "93e770be5c3ee06bbb587c272a8b46cee1a0b85adb5872f6cb335a8a60
 const User = require('./User');
 const Trip = require('./Trip');
 const { Op } = require("sequelize");
-
 function generateAccessToken(username) {
     return jwt.sign({username}, token_secret, { expiresIn: '10800s' });
 }
@@ -127,6 +126,7 @@ app.post('/share/trip', async(req,res) => {
                     trip.oraPlecare = req.body.oraPlecare;
                     trip.durataCalatoriei = req.body.durataCalatoriei;
                     trip.observatii = req.body.observatii;
+                    trip.gradAglomerare = req.body.gradAglomerare;
                     trip.nivelulSatisfactiei = req.body.nivelulSatisfactiei; 
                     await trip.save();
                     res.status(202).json({ message: 'updated'});
