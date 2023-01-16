@@ -113,7 +113,7 @@ app.post('/share/trip', async(req,res) => {
     const token = authenticateToken(req);
     if(token)
     {
-        const id = req.body.id;
+        const id = req.body.idTrip;
         if(id)
         {
             try{  
@@ -181,7 +181,7 @@ app.get('/share/trips', async(req,res) =>{
     }
 });
 
-app.delete('/share/delete', async(req,res) => {
+app.delete('/share/trip', async(req,res) => {
     const token = authenticateToken(req);
     if(token)
     {

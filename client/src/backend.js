@@ -7,7 +7,7 @@ export async function backendRequest(method, path, params, headers={}) {
         url += "?" + new URLSearchParams(params);  
     }
 
-    if (method === "POST") {
+    if (method !== "GET") {
         hdr["Content-Type"] = "application/json";
         body = JSON.stringify(params);
     }

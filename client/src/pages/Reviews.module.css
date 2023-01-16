@@ -1,0 +1,18 @@
+.revTable {
+    display: grid;
+    grid-template-columns: repeat(4, auto) 96px repeat(5, auto);
+    column-gap: 16px;
+    row-gap: 32px;
+}
+
+.error {
+    grid-column-end: span 10;
+}
+
+.revTable form {
+    display: flex;
+}
+
+.revTable form input {
+    width: 100%;
+}
