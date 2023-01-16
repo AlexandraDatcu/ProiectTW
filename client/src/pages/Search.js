@@ -49,7 +49,7 @@ export default function Search() {
                 </select>
             </div>
 
-            {isError && <h1>{error}</h1>}
+            {isError && <h1>{`${error}`}</h1>}
             {isLoading && <h1>Loading...</h1>}
             {isSuccess && <div className={styles.results}>
                 <ReviewHeader/>

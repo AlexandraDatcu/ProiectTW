@@ -229,7 +229,9 @@ app.get('/search', async(req,res) =>{
     for (const key of ["plecareA", "sosireB", "mijlocTransport"]) {
         const val = req.query[key];
         if (val) {
-            params.push({[key]: val});
+            params.push(
+                sequelize.where(sequelize.fn("LOWER", sequelize.col(key)), "LIKE", `%${val.toLowerCase()}%`)
+            );
         }
     }
     try{
