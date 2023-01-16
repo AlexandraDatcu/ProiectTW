@@ -33,8 +33,7 @@ const Trip = sequelize.define('trip', {
         values: ['liber', 'mediu', 'aglomerat']
     },
     observatii: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.STRING
     },
     nivelulSatisfactiei: {
         type: DataTypes.ENUM,

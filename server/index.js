@@ -11,6 +11,7 @@ const { Op } = require("sequelize");
 function generateAccessToken(username) {
     return jwt.sign({username}, token_secret, { expiresIn: '10800s' });
 }
+
 function authenticateToken(req)
 {
     const authHeader = req.headers['authorization'];
@@ -219,7 +220,7 @@ app.get('/trips', async(req,res) =>{
     }
 });
 
-app.get('/search/?', async(req,res) =>{
+app.get('/search', async(req,res) =>{
     const plecareA = req.query.plecareA;
     const plecareB = req.query.sosireB;
     const mijolocTransport = req.query.mijlocTransport;
