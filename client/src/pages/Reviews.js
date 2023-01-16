@@ -69,7 +69,7 @@ function EditRow({initial = {}, onCancel}) {
                 <option value="mediu">Medium</option>
                 <option value="aglomerat">Crowded</option>
             </select>
-            <textarea placeholder="Whatever comments you may have" {...inputProps("observatii")}>
+            <textarea placeholder="Whatever comments you may have" {...inputProps("observatii")} required={false}>
             </textarea>
             <select {...inputProps("nivelulSatisfactiei")}>
                 <option value="">Pick one</option>
