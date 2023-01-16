@@ -130,6 +130,7 @@ app.post('/share/trip', async(req,res) => {
                     trip.gradAglomerare = req.body.gradAglomerare;
                     trip.nivelulSatisfactiei = req.body.nivelulSatisfactiei; 
                     await trip.save();
+                    
                     res.status(202).json({ message: 'updated'});
                 }
                 else
