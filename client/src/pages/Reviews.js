@@ -3,6 +3,7 @@ import { useState, Fragment } from "react";
 import styles from "./Reviews.module.css";
 import { backendRequest } from "../backend";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Review, ReviewHeader } from "../components/Review";
 
 function addTrip(data) {
     return backendRequest("POST", "/share/trip", data.trip, {
@@ -33,6 +34,7 @@ function EditRow({initial = {}, onCancel}) {
         mutationFn: addTrip,
         onSuccess() {
             queryClient.invalidateQueries({queryKey: ["reviews", jwt]});
+            queryClient.invalidateQueries({queryKey: ["allTrips"]});
             doCancel();
         },
         onError(err) {
@@ -105,6 +107,7 @@ export default function Reviews() {
         mutationFn: deleteTrip,
         onSuccess() {
             queryClient.invalidateQueries({queryKey: ["reviews", jwt]});
+            queryClient.invalidateQueries({queryKey: ["allTrips"]});
         },
         onError(err) {
             alert(`${err}`);
@@ -125,30 +128,7 @@ export default function Reviews() {
     return (
         <div className={styles.revTable}>
             {isError && <h1 className={styles.error}>{`${error}`}</h1>}
-            <div>
-                From (A)
-            </div>
-            <div>
-                To (B)
-            </div>
-            <div>
-                Mode
-            </div>
-            <div>
-                Departure time
-            </div>
-            <div>
-                Duration
-            </div>
-            <div>
-                Crowded factor
-            </div>
-            <div>
-                Comments
-            </div>
-            <div>
-                Rating
-            </div>
+            <ReviewHeader/>
             <div></div>
             <div></div>
             <EditRow/>
@@ -157,14 +137,7 @@ export default function Reviews() {
                 editing === trip.idTrip ?
                 <EditRow key={trip.idTrip} initial={trip} onCancel={() => setEditing(null)}/> :
                 <Fragment key={trip.idTrip}>
-                    <div>{trip.plecareA}</div>
-                    <div>{trip.sosireB}</div>
-                    <div>{trip.mijlocTransport}</div>
-                    <div>{trip.oraPlecare}</div>
-                    <div>{trip.durataCalatoriei}</div>
-                    <div>{trip.gradAglomerare}</div>
-                    <div>{trip.observatii}</div>
-                    <div>{trip.nivelulSatisfactiei}</div>
+                    <Review trip={trip}/>
                     <button type="button" onClick={() => setEditing(trip.idTrip)}>Edit</button>
                     <button disabled={deleteMutation.isLoading} type="button"
                         onClick={() => window.confirm("Are you sure?") && deleteMutation.mutate({

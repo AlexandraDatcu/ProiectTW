@@ -4,6 +4,7 @@ import Reviews from '../pages/Reviews';
 import MyAccount from '../pages/MyAccount';
 import { useState } from 'react';
 import { useUserName } from '../state/User';
+import Search from '../pages/Search';
 
 export default function MainNavigation(){
     const [activeIndex, setActiveIndex] = useState(3);  
@@ -25,6 +26,7 @@ export default function MainNavigation(){
                     <button {...buttonProps(3)}> {userName || "Log in"}</button>
                 </div>
             </div>
+            {activeIndex === 1 && <Search/>}
             {activeIndex === 2 && <Reviews/>}
             {activeIndex === 3 && (userName ? <MyAccount/> : <LogIn/>)}
             

@@ -225,23 +225,23 @@ app.get('/search', async(req,res) =>{
     const plecareA = req.query.plecareA;
     const plecareB = req.query.sosireB;
     const mijolocTransport = req.query.mijlocTransport;
-    if(plecareA != null && plecareB != null && mijolocTransport != null)
-    {
-        try{
-            const trips = await Trip.findAll({
-                where : {
-                    [Op.and]: [  
-                        {plecareA : plecareA},
-                        {sosireB : plecareB},
-                        {mijlocTransport : mijolocTransport}
-                    ]
-                }
-            });
-            res.status(200).json(trips);
-            
-        }catch(err){
-            res.status(400).json({message: 'syntax error'});
+    const params = [];
+    for (const key of ["plecareA", "sosireB", "mijlocTransport"]) {
+        const val = req.query[key];
+        if (val) {
+            params.push({[key]: val});
         }
+    }
+    try{
+        const trips = await Trip.findAll({
+            where : {
+                [Op.and]: params
+            }
+        });
+        res.status(200).json(trips);
+        
+    }catch(err){
+        res.status(400).json({message: 'syntax error'});
     }
 });
 

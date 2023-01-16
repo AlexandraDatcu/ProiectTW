@@ -1,0 +1,14 @@
+.filter {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    column-gap: 16px;
+    row-gap: 32px;
+}
+
+.results {
+    margin-top: 64px;
+    display: grid;
+    grid-template-columns: repeat(8, auto);
+    column-gap: 16px;
+    row-gap: 32px;
+}
